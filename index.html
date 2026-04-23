@@ -1,0 +1,974 @@
+
+公式LI
+
+
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我慢グセ タイプ診断｜心理カウンセラー シェル</title>
+
+<style>
+  :root {
+    --sage: #8BA888;
+    --sage-light: #C4D4C2;
+    --sage-pale: #EEF3ED;
+    --terracotta: #C07857;
+    --terracotta-light: #E8C5B0;
+    --cream: #F9F5EF;
+    --warm-white: #FDFAF6;
+    --ink: #2C2A27;
+    --ink-light: #5C5A57;
+    --gold: #B8960C;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== BACKGROUND TEXTURE ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(139,168,136,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(192,120,87,0.10) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238BA888' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    text-align: center;
+    padding: 48px 20px 36px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards;
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--sage);
+    border: 1px solid var(--sage-light);
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    background: rgba(196,212,194,0.15);
+  }
+
+  .header h1 {
+    font-family: -apple-system, 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .header h1 em {
+    font-style: normal;
+    color: var(--terracotta);
+  }
+
+  .header p {
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.8;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  /* ===== PROGRESS ===== */
+  .progress-wrap {
+    margin: 0 0 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .progress-bar-bg {
+    height: 4px;
+    background: var(--sage-light);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sage), var(--terracotta));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ink-light);
+    margin-top: 8px;
+  }
+
+  /* ===== QUESTION CARD ===== */
+  .question-card {
+    background: var(--warm-white);
+    border-radius: 20px;
+    padding: 36px 32px;
+    box-shadow: 0 2px 20px rgba(44,42,39,0.06), 0 0 0 1px rgba(139,168,136,0.15);
+    opacity: 0;
+    animation: fadeUp 0.6s ease 0.3s forwards;
+  }
+
+  .question-num {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--sage);
+    margin-bottom: 12px;
+  }
+
+  .question-text {
+    font-family: -apple-system, 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    font-size: clamp(17px, 4vw, 21px);
+    font-weight: 600;
+    line-height: 1.65;
+    color: var(--ink);
+    margin-bottom: 28px;
+  }
+
+  /* ===== OPTIONS ===== */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: var(--sage-pale);
+    border: 1.5px solid transparent;
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s ease;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14.5px;
+    color: var(--ink);
+    line-height: 1.6;
+    width: 100%;
+  }
+
+  .option-btn:hover {
+    border-color: var(--sage);
+    background: rgba(139,168,136,0.15);
+    transform: translateX(4px);
+  }
+
+  .option-btn.selected {
+    border-color: var(--terracotta);
+    background: rgba(192,120,87,0.08);
+    color: var(--ink);
+  }
+
+  .option-circle {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--sage-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+  }
+
+  .option-btn.selected .option-circle {
+    border-color: var(--terracotta);
+    background: var(--terracotta);
+  }
+
+  .option-btn.selected .option-circle::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+  }
+
+  /* ===== NAVIGATION ===== */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    gap: 12px;
+  }
+
+  .btn-prev {
+    padding: 12px 24px;
+    background: transparent;
+    border: 1.5px solid var(--sage-light);
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-prev:hover {
+    border-color: var(--sage);
+    color: var(--ink);
+  }
+
+  .btn-next {
+    flex: 1;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--sage) 0%, #6D9B6A 100%);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139,168,136,0.35);
+  }
+
+  .btn-next:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139,168,136,0.45);
+  }
+
+  .btn-next:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-result {
+    flex: 1;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--terracotta) 0%, #A86040 100%);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(192,120,87,0.35);
+  }
+
+  .btn-result:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(192,120,87,0.45);
+  }
+
+  .btn-result:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* ===== RESULT ===== */
+  .result-screen {
+    display: none;
+  }
+
+  .result-screen.show {
+    display: block;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards;
+  }
+
+  .result-type-badge {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .result-type-label {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    font-weight: 500;
+    color: var(--terracotta);
+    padding: 6px 18px;
+    border: 1px solid var(--terracotta-light);
+    border-radius: 20px;
+    background: rgba(232,197,176,0.2);
+    margin-bottom: 16px;
+  }
+
+  .result-type-name {
+    font-family: -apple-system, 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    font-size: clamp(26px, 7vw, 38px);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .result-type-name em {
+    font-style: normal;
+    color: var(--terracotta);
+  }
+
+  .result-card {
+    background: var(--warm-white);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 2px 20px rgba(44,42,39,0.06), 0 0 0 1px rgba(192,120,87,0.12);
+    margin-bottom: 20px;
+  }
+
+  .result-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sage);
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+  }
+
+  .result-section-title::before {
+    content: '';
+    width: 20px;
+    height: 2px;
+    background: var(--sage);
+    border-radius: 1px;
+  }
+
+  .result-desc {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .result-highlight {
+    background: linear-gradient(180deg, transparent 60%, rgba(196,212,194,0.5) 60%);
+    padding: 0 2px;
+  }
+
+  .work-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .work-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--sage-pale);
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .work-num {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background: var(--sage);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  .note-cta {
+    background: linear-gradient(135deg, #2C2A27 0%, #4A3728 100%);
+    border-radius: 20px;
+    padding: 32px;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .note-cta::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 120px;
+    height: 120px;
+    background: rgba(192,120,87,0.2);
+    border-radius: 50%;
+  }
+
+  .note-cta::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    left: -20px;
+    width: 100px;
+    height: 100px;
+    background: rgba(139,168,136,0.15);
+    border-radius: 50%;
+  }
+
+  .note-cta-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .note-cta h3 {
+    font-family: -apple-system, 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .note-cta p {
+    font-size: 13px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.8);
+    position: relative;
+    z-index: 1;
+    margin-bottom: 20px;
+  }
+
+  .note-cta-btn {
+    display: inline-block;
+    background: var(--terracotta);
+    color: white;
+    padding: 13px 30px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    border: none;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.25s ease;
+  }
+
+  .note-cta-btn:hover {
+    background: #A86040;
+    transform: translateY(-2px);
+  }
+
+  .btn-retry {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1.5px solid var(--sage-light);
+    border-radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    color: var(--ink-light);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+
+  .btn-retry:hover {
+    border-color: var(--sage);
+    color: var(--ink);
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-out {
+    animation: slideOut 0.3s ease forwards;
+  }
+
+  @keyframes slideOut {
+    to { opacity: 0; transform: translateX(-20px); }
+  }
+
+  .slide-in {
+    animation: fadeUp 0.4s ease forwards;
+  }
+
+  /* ===== INTRO SCREEN ===== */
+  .intro-screen {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .intro-illust {
+    font-size: 56px;
+    margin-bottom: 12px;
+    display: block;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .intro-card {
+    background: var(--warm-white);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 2px 20px rgba(44,42,39,0.06), 0 0 0 1px rgba(139,168,136,0.15);
+    margin-bottom: 24px;
+    text-align: left;
+  }
+
+  .intro-points {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .intro-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+
+  .intro-point-icon {
+    flex-shrink: 0;
+    color: var(--sage);
+    font-size: 16px;
+    margin-top: 1px;
+  }
+
+  .btn-start {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--sage) 0%, #6D9B6A 100%);
+    border: none;
+    border-radius: 14px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(139,168,136,0.4);
+    letter-spacing: 0.05em;
+  }
+
+  .btn-start:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(139,168,136,0.5);
+  }
+
+  .credit {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-light);
+    opacity: 0.6;
+    margin-top: 16px;
+  }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-badge">心理カウンセラー シェル</div>
+    <h1>あなたの「<em>我慢グセ</em>」<br>タイプ診断</h1>
+    <p>言いたいことが言えない、ついつい我慢してしまう…<br>その根っこにある"心のクセ"を知りましょう。</p>
+  </div>
+
+  <!-- INTRO SCREEN -->
+
+  <div id="introScreen" class="intro-screen">
+    <span class="intro-illust">🌿</span>
+    <div class="intro-card">
+      <div class="result-section-title">診断でわかること</div>
+      <ul class="intro-points">
+        <li class="intro-point">
+          <span class="intro-point-icon">✦</span>
+          あなたの我慢グセの「パターン」と背景にある心理
+        </li>
+        <li class="intro-point">
+          <span class="intro-point-icon">✦</span>
+          タイプ別の「つい我慢してしまう場面」の傾向
+        </li>
+        <li class="intro-point">
+          <span class="intro-point-icon">✦</span>
+          今日からできるセルフワーク・関係改善のヒント
+        </li>
+      </ul>
+    </div>
+    <button class="btn-start" id="btnStart">診断をはじめる（全10問）</button>
+    <p class="credit">所要時間：約3〜5分</p>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+
+  <div id="quizScreen" style="display:none;">
+    <div class="progress-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar" style="width:10%"></div>
+      </div>
+      <div class="progress-text">
+        <span id="progressLabel">1 / 10</span>
+        <span id="progressPct">10%</span>
+      </div>
+    </div>
+
+```
+<div class="question-card" id="questionCard">
+  <div class="question-num" id="questionNum">Q1</div>
+  <div class="question-text" id="questionText"></div>
+  <div class="options" id="optionsArea"></div>
+  <div class="nav">
+    <button class="btn-prev" id="btnPrev">← 戻る</button>
+    <button class="btn-next" id="btnNext" disabled>次へ →</button>
+    <button class="btn-result" id="btnResult" disabled style="display:none;">結果を見る ✦</button>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- RESULT SCREEN -->
+
+  <div id="resultScreen" class="result-screen">
+    <div class="result-type-badge">
+      <div class="result-type-label">あなたのタイプ</div>
+      <div class="result-type-name" id="resultTypeName"></div>
+    </div>
+
+```
+<div class="result-card">
+  <div class="result-section-title">このタイプの特徴</div>
+  <p class="result-desc" id="resultDesc"></p>
+</div>
+
+<div class="result-card">
+  <div class="result-section-title">あなたの強み</div>
+  <p class="result-desc" id="resultStrength"></p>
+</div>
+
+<div class="result-card">
+  <div class="result-section-title">今日からできるワーク</div>
+  <ul class="work-list" id="resultWork"></ul>
+</div>
+
+<div class="note-cta">
+  <div class="note-cta-icon">📖</div>
+  <h3>もっと深く知りたいあなたへ</h3>
+  <p>タイプ別の人間関係改善メソッドや<br>具体的なワークシートをnoteで公開中。<br>読んでくださった方からの変化の声が届いています。</p>
+  <button class="note-cta-btn" id="btnNote">noteで詳しく読む →</button>
+</div>
+
+<button class="btn-retry" id="btnRetry">🔄 もう一度診断する</button>
+```
+
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    text: "誰かに「ちょっとお願いがあるんだけど」と言われると、どんな気持ちになりますか？",
+    options: [
+      { text: "断ったら嫌われてしまうかも、と不安になる", type: "A" },
+      { text: "「また私が引き受けるの？」とモヤっとするが、結局引き受ける", type: "B" },
+      { text: "内容次第だと思いつつ、断る理由を探し始める", type: "C" },
+      { text: "「私にできるかな」と不安で、つい引き受けてしまう", type: "D" },
+    ]
+  },
+  {
+    text: "会議や話し合いで自分と違う意見が出たとき、あなたは？",
+    options: [
+      { text: "「そうですね」と同意してしまいやすい", type: "A" },
+      { text: "心の中ではモヤモヤするが、言い出せない", type: "B" },
+      { text: "反論したいが、空気を乱すのが怖くて黙る", type: "C" },
+      { text: "「自分の考えが間違っているのかも」と思ってしまう", type: "D" },
+    ]
+  },
+  {
+    text: "誰かに傷つくことを言われたとき、あなたはどう反応しますか？",
+    options: [
+      { text: "「大丈夫です」と笑ってごまかしてしまう", type: "A" },
+      { text: "その場は流して、後でじわじわ傷つく", type: "B" },
+      { text: "すごく傷ついたのに、なぜか謝ってしまう", type: "C" },
+      { text: "「自分が何か悪かったのかも」と考えてしまう", type: "D" },
+    ]
+  },
+  {
+    text: "友人・パートナーとの予定を断りたいとき、あなたは？",
+    options: [
+      { text: "すごく罪悪感を感じて、断れずに無理して行く", type: "A" },
+      { text: "断ると決めても、長々と謝り続けてしまう", type: "B" },
+      { text: "「仕方ない理由」を必死に考えてしまう", type: "C" },
+      { text: "断ったあとも「よかったのかな」と気になり続ける", type: "D" },
+    ]
+  },
+  {
+    text: "「ありがとう」や「助かった」と感謝されたとき、あなたは？",
+    options: [
+      { text: "うれしいけど「当然のことをしただけ」と思う", type: "A" },
+      { text: "素直に受け取れず、「大したことじゃないので」と言ってしまう", type: "D" },
+      { text: "うれしいのに、照れて話をそらしてしまう", type: "C" },
+      { text: "「次も期待に応えなきゃ」とプレッシャーに感じる", type: "B" },
+    ]
+  },
+  {
+    text: "自分の「したくない」「疲れた」という気持ちについて、どう感じますか？",
+    options: [
+      { text: "「そんなこと言ってはいけない」と自分を責める", type: "A" },
+      { text: "感じることはあるが、他の人の前には絶対に出さない", type: "C" },
+      { text: "「もっと頑張れるはず」と無視してしまいがち", type: "B" },
+      { text: "「こんな自分はダメだ」と落ち込みやすい", type: "D" },
+    ]
+  },
+  {
+    text: "グループの中で「誰が残業する？」という話になったとき、あなたは？",
+    options: [
+      { text: "シーンとなると、つい「私がやります」と言ってしまう", type: "A" },
+      { text: "やりたくないのに、なぜか自分が引き受けていることが多い", type: "B" },
+      { text: "本当は言いたいことがあるのに、場の空気を読んで黙る", type: "C" },
+      { text: "「私が言うのはおかしいのかな」と不安になって発言できない", type: "D" },
+    ]
+  },
+  {
+    text: "大切な人との間に問題が起きたとき、あなたは？",
+    options: [
+      { text: "相手を怒らせたくなくて、自分から折れてしまう", type: "A" },
+      { text: "本音を話すのが怖くて、表面上は普通のふりをする", type: "C" },
+      { text: "「私が我慢すれば丸く収まる」と思ってしまう", type: "B" },
+      { text: "「私が悪いのかも」と思って、相手に合わせてしまう", type: "D" },
+    ]
+  },
+  {
+    text: "自分の気持ちや意見を「伝えたい」と思うとき、何が一番の壁になりますか？",
+    options: [
+      { text: "「嫌われたら怖い」という不安", type: "A" },
+      { text: "「言っても変わらない、どうせ…」という諦め感", type: "B" },
+      { text: "「空気を乱したくない」という気持ち", type: "C" },
+      { text: "「うまく言えないかも」「私の感覚がおかしいかも」という自信のなさ", type: "D" },
+    ]
+  },
+  {
+    text: "1日の終わりに「今日の自分」を振り返るとしたら、どんな気持ちになることが多いですか？",
+    options: [
+      { text: "「また気を使いすぎてしまった」", type: "A" },
+      { text: "「何でいつも私ばっかり…」", type: "B" },
+      { text: "「本当のことを言えなかった」", type: "C" },
+      { text: "「今日もうまくできなかった」", type: "D" },
+    ]
+  }
+];
+
+const types = {
+  A: {
+    name: "「嫌われたくない」\n共感型",
+    nameHtml: "「嫌われたくない」<em>共感型</em>",
+    desc: "人の気持ちに敏感で、相手が不快に思わないかどうかをいつも先に考えてしまいます。「NOと言ったら関係が壊れる」という不安が根っこにあり、相手に合わせることが『愛情の示し方』になっていることが多いタイプです。",
+    strength: "相手の気持ちを読む力が高く、場の空気を大切にできる、思いやりの深い人です。その優しさはあなたの本物の強みです。ただ、その優しさを「自分のため」にも使えるようになると、さらに人間関係が楽になります。",
+    works: [
+      "1日1回、小さなことでいいので「私は今日〇〇したかった（したくなかった）」を日記に書いてみましょう。",
+      "断るときは「理由」より「一言謝辞＋自分の状況」でOK。「ありがとう、今回は難しくて」で十分です。",
+      "「嫌われたくない」と感じたとき、「それでも私を大切にしてくれる人は？」と問いかけてみてください。"
+    ]
+  },
+  B: {
+    name: "「私ばっかり」\n疲弊型",
+    nameHtml: "「私ばっかり」<em>疲弊型</em>",
+    desc: "いつの間にか損な役回りを引き受けていて、内心「なんで私ばかり」と思っているのに言い出せない。我慢してきた時間が長く、心の底にモヤモヤや怒りが溜まっているタイプです。本音を言うことへの諦めや「言っても仕方ない」感が出てきているのかもしれません。",
+    strength: "責任感が強く、最後まで投げ出さない芯の強さを持っています。黙って抱えてきたあなたの我慢は本物の力です。その力を「自分を守ること」にも向けていいんだと知ってほしいのです。",
+    works: [
+      "「私がやらなかったらどうなるか」を一度、頭の中で想像してみてください。意外と誰かが動くことも。",
+      "「〇〇してもらえると助かります」という頼み言葉を、一週間に一度だけ試してみましょう。",
+      "自分の怒りやモヤモヤを「おかしい感情」ではなく「サインのメッセージ」として受け取る練習を。"
+    ]
+  },
+  C: {
+    name: "「空気を読みすぎ」\n同調型",
+    nameHtml: "「空気を読みすぎ」<em>同調型</em>",
+    desc: "場の雰囲気を乱したくない、波風を立てたくない、という気持ちが強く、自分の本音を押し込める癖がついています。「どうせ言っても…」という気持ちより、「今は言うべきでない」という判断が先に立つタイプです。表面上は穏やかに見えても、内側はいつも気を張っている状態かもしれません。",
+    strength: "状況を読む力・場をまとめる力が高く、チームや関係の中でとても大切な存在です。その「察する力」は本物の才能。それを自分のために使う場面を少しずつ増やしていきましょう。",
+    works: [
+      "安心できる相手に、まず「実は〇〇って感じてた」と小さな本音を話してみましょう。",
+      "「空気を乱す」と「自分の意見を言う」は違います。その違いを書き出して整理してみてください。",
+      "自分の意見を声に出す前に紙に書く習慣を。「書く→読む→伝える」のステップが練習になります。"
+    ]
+  },
+  D: {
+    name: "「自信がない」\n自己否定型",
+    nameHtml: "「自信がない」<em>自己否定型</em>",
+    desc: "「自分の感覚がおかしいのかも」「うまく言えなかったらどうしよう」という不安から、意見を言う前に自分を否定してしまいやすいタイプです。他の人のことは大切にできるのに、自分自身への優しさが一番薄くなっていることが多いです。",
+    strength: "物事を深く考える力、丁寧に関わろうとする誠実さはあなたの大切な個性です。「自信がない」のは能力がないのではなく、自分への見方がまだ育ち途中なだけ。その丁寧さを自分にも向けてみてください。",
+    works: [
+      "「自分の感覚はおかしくない」と自分に言い聞かせることから始めてみましょう。まず信じる練習です。",
+      "誰かに言えなかった本音を、毎日1行だけ「言えたとしたら…」という形で書いてみてください。",
+      "「私はこう思う」を声に出すとき、正しいかどうかより「感じた」事実を伝えることを意識してみて。"
+    ]
+  }
+};
+
+let current = 0;
+let answers = new Array(10).fill(null);
+let scores = { A: 0, B: 0, C: 0, D: 0 };
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('btnStart').addEventListener('click', startDiagnosis);
+  document.getElementById('btnPrev').addEventListener('click', prevQuestion);
+  document.getElementById('btnNext').addEventListener('click', nextQuestion);
+  document.getElementById('btnResult').addEventListener('click', showResult);
+  document.getElementById('btnRetry').addEventListener('click', resetDiagnosis);
+  document.getElementById('btnNote').addEventListener('click', function() {
+    alert('noteへのリンクをここに設定してください📝');
+  });
+});
+
+function startDiagnosis() {
+  document.getElementById('introScreen').style.display = 'none';
+  document.getElementById('quizScreen').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  document.getElementById('questionNum').textContent = `Q${current + 1}`;
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('progressLabel').textContent = `${current + 1} / ${questions.length}`;
+  const pct = Math.round(((current + 1) / questions.length) * 100);
+  document.getElementById('progressPct').textContent = `${pct}%`;
+  document.getElementById('progressBar').style.width = `${pct}%`;
+
+  const area = document.getElementById('optionsArea');
+  area.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[current] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="option-circle"></span><span>${opt.text}</span>`;
+    btn.onclick = () => selectOption(i);
+    area.appendChild(btn);
+  });
+
+  const isLast = current === questions.length - 1;
+  document.getElementById('btnNext').style.display = isLast ? 'none' : 'block';
+  document.getElementById('btnResult').style.display = isLast ? 'block' : 'none';
+  document.getElementById('btnPrev').style.display = current === 0 ? 'none' : 'block';
+
+  updateNavButtons();
+}
+
+function selectOption(idx) {
+  answers[current] = idx;
+  document.querySelectorAll('.option-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === idx);
+  });
+  updateNavButtons();
+}
+
+function updateNavButtons() {
+  const selected = answers[current] !== null;
+  document.getElementById('btnNext').disabled = !selected;
+  document.getElementById('btnResult').disabled = !selected;
+}
+
+function nextQuestion() {
+  if (current < questions.length - 1) {
+    current++;
+    renderQuestion();
+  }
+}
+
+function prevQuestion() {
+  if (current > 0) {
+    current--;
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  // Tally scores
+  scores = { A: 0, B: 0, C: 0, D: 0 };
+  answers.forEach((ans, qi) => {
+    if (ans !== null) {
+      const type = questions[qi].options[ans].type;
+      scores[type]++;
+    }
+  });
+
+  const winner = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+  const result = types[winner];
+
+  document.getElementById('quizScreen').style.display = 'none';
+  const rs = document.getElementById('resultScreen');
+  rs.style.display = 'block';
+  rs.classList.add('show');
+
+  document.getElementById('resultTypeName').innerHTML = result.nameHtml;
+  document.getElementById('resultDesc').textContent = result.desc;
+  document.getElementById('resultStrength').textContent = result.strength;
+
+  const workList = document.getElementById('resultWork');
+  workList.innerHTML = '';
+  result.works.forEach((w, i) => {
+    const li = document.createElement('li');
+    li.className = 'work-item';
+    li.innerHTML = `<span class="work-num">${i + 1}</span><span>${w}</span>`;
+    workList.appendChild(li);
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetDiagnosis() {
+  current = 0;
+  answers = new Array(10).fill(null);
+  scores = { A: 0, B: 0, C: 0, D: 0 };
+
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('introScreen').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
